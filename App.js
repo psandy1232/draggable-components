@@ -1,42 +1,112 @@
 import React, { useState } from 'react';
-import './App.css';
-import Main from './Main';
+//import './App.css';
+//import Main from './Main';
+
+const getUniqueRandValue = () => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+  //return '_' + Math.random().toString(36).substr(2, 9);
+}
 
 const toolBoxData = [
-  { id: 1, name: 'input', textToShow: 'Text Input' },
-  { id: 2, name: 'dropdown', textToShow: 'Drop Down' },
-  { id: 3, name: 'radio', textToShow: 'Multiple Choice' },
-  { id: 4, name: 'Date', textToShow: 'Date' },
-  { id: 5, name: 'heading', textToShow: 'Heading Text' },
-  { id: 6, name: 'subheading', textToShow: 'Sub Heading Text' },
-  { id: 7, name: 'checkbox', textToShow: 'Check Boxes' },
-  { id: 8, name: 'textarea', textToShow: 'Multiline Input' }
+  { name: 'input', textToShow: 'Text Input' },
+  { name: 'dropdown', textToShow: 'Drop Down' },
+  { name: 'radio', textToShow: 'Multiple Choice' },
+  { name: 'date', textToShow: 'Date' },
+  { name: 'heading', textToShow: 'Heading' },
+  { name: 'subheading', textToShow: 'Sub Heading' },
+  { name: 'numberinput', textToShow: 'Number Input' },
+  { name: 'textarea', textToShow: 'Multiline Input' }
 ];
 
 const initialFormFieldData = {
   'input': {
     'fieldtype':'input',
+    'textToShow': 'Text Input',
     'placeHolderLabel': 'Choose Label Name',
     'placeHolderText': 'Enter Your Name',
     'id': 'userid',
     'name': 'username',
     'required': true,
-    'defaultValue': 'testing',
-    'sortorder' : 0
+    'defaultValue': '',
+    'sortorder' : 0,
+    'uniqId' : getUniqueRandValue()
+  },
+  'numberinput': {
+    'fieldtype':'numberinput',
+    'textToShow': 'Number Input',
+    'placeHolderLabel': 'Choose Label Name',
+    'placeHolderText': '',
+    'minimum' : null,
+    'maximum' : null,
+    'id': 'userid',
+    'name': 'username',
+    'required': true,
+    'defaultValue': '',
+    'sortorder' : 0,
+    'uniqId' : getUniqueRandValue()
+  },
+  'textarea': {
+    'fieldtype':'textarea',
+    'textToShow': 'Multiline Input',
+    'placeHolderLabel': 'Choose Label Name',
+    'placeHolderText': 'Enter Your Name',
+    'id': 'userid',
+    'name': 'name',
+    'required': true,
+    'defaultValue': '',
+    'sortorder' : 0,
+    'uniqId' : getUniqueRandValue()
   },
   'dropdown': {
     'fieldtype':'dropdown',
+    'textToShow': 'Drop Down',
     'placeHolderLabel': 'Placeholder Label',
     'placeHolderText': 'Enter Your Name',
-    'id': 'userid',
-    'name': 'username',
-    'required': false,
+    'id': 'id',
+    'name': 'name',
+    'required': true,
     'defaultValue': '',
-    'sortorder' : 0
-  }
+    'sortorder' : 0,
+    'uniqId' : getUniqueRandValue(),
+    'options' : [
+      {'id' : getUniqueRandValue(), 'option' : 'option 1'},
+      {'id' : getUniqueRandValue(), 'option' : 'option 2'},
+    ]
+  },
+  'radio': {
+    'fieldtype':'radio',
+    'textToShow': 'Multiple Choice',
+    'placeHolderLabel': 'Placeholder Label',
+    'placeHolderText': 'Enter Your Name',
+    'id': 'id',
+    'name': 'name',
+    'required': true,
+    'defaultValue': '',
+    'sortorder' : 0,
+    'uniqId' : getUniqueRandValue(),
+    'options' : [
+      {'id' : getUniqueRandValue(), 'name':'male', 'idattr':'male', 'label' : 'Male', 'option' : 'Male'},
+      {'id' : getUniqueRandValue(), 'name':'female', 'idattr':'female', 'label' : 'Female', 'option' : 'Female'},
+    ]
+  },
+  'date': {
+    'fieldtype':'date',
+    'textToShow': 'Date',
+    'placeHolderLabel': 'YYYY-MM-DD',
+    'id': 'date',
+    'name': 'date',
+    'required': true,
+    'placeHolderText': 'Enter Your Name',
+    'sortorder' : 0,
+    'uniqId' : getUniqueRandValue()
+  },
 }
 
 function App() {
+  
   const [tasks, setTasks] = useState([]);
   const [popupShow, setTogglePopup] = useState(false);
   const [popupData, setPopupData] = useState();
@@ -49,7 +119,6 @@ function App() {
     e.dataTransfer.setData("text/html", e.parentNode)
     
   }
-
   const onDragOver = (ev) => {
     ev.preventDefault();    
   }
@@ -58,6 +127,7 @@ function App() {
     if (fieldtype) {
       let data = initialFormFieldData[fieldtype];
       data.sortorder = tasks.length;
+      data.uniqId =  getUniqueRandValue();
       setTasks([...tasks,
         data
       ]);
@@ -68,8 +138,60 @@ function App() {
       ...popupData,
       [key]:val
     })
-    //setPopupData(tasks[index]);
   }
+  /* Select option operation code goes here */
+  const addSelectOption = () => {
+    let newArr = [...popupData.options, {'id':getUniqueRandValue(),'option':''}];
+    setPopupData({
+      ...popupData,
+      options : newArr
+    })
+  }
+  const updatePopupSelectOption = (index,value) => {
+    let newArr = [...popupData.options];
+    newArr[index] = {'id':getUniqueRandValue(),'option':value};     
+    setPopupData({
+      ...popupData,     
+      options : newArr
+    })
+  }
+  const deletePopupSelectOption = (index, id) => {
+    let newArr = [...popupData.options];
+    newArr = newArr.filter(item => item.id !== id);
+    setPopupData({
+      ...popupData,
+      options : newArr
+    })  
+  }
+  /* End of Select option opreation code */
+
+  /* Radio options operation code goes here */
+  const addRadioOption = () => {
+    let newArr = [...popupData.options, {'id':getUniqueRandValue(),'label':'','option':''}];
+    setPopupData({
+      ...popupData,
+      options : newArr
+    })
+  }
+  const updatePopupRadioOption = (index,key,value) => {
+    let newArr = [...popupData.options];
+    newArr[index][key] = value;
+    setPopupData({
+      ...popupData,     
+      options : newArr
+    })
+  }
+  const deletePopupRadioOption = (index, id) => {
+    let newArr = [...popupData.options];
+    newArr = newArr.filter(item => item.id !== id);
+    setPopupData({
+      ...popupData,
+      options : newArr
+    })
+  }
+  /* End of Select option opreation code */
+
+  
   const editFieldData = (index) => {
     setActiveTaskIndex(index);
     setPopupData(tasks[index]);
@@ -86,28 +208,30 @@ function App() {
     setTasks(replaceData)
     setTogglePopup(false)
   }
-  const deleteFieldData = (i) => {
-    let data = tasks;
-    data.splice(i,1);
-    setTasks(data);
+  const deleteFieldData = (uniqId) => {
+    let data = tasks.filter(item => item.uniqId !== uniqId);
+    setTasks(data);    
   }
-  console.log(tasks,"tas")
+  console.log(tasks,"t")
   return (
     <div className="App">
       <div className="container">
-        <div className="innercontainer">
+        <div className="main_fluid">
+
+        <div className = "container_fluid">
+            <h3>Form Builder</h3>            
+        </div>
 
 
+        <div className = "container_fluid">
           <div className="drop-fluid">
             <div className="drop-inner">
-
-
               <div className="drop-area"
                 onDragOver={(e) => onDragOver(e)}
                 onDrop={(e) => { onDrop(e) }}
               >
 
-                {tasks.length == 0 ?
+                {tasks.length === 0 ?
                   <h3
                     className="notoolboxes">
                     Select / Drop an item from Toolbox
@@ -128,36 +252,80 @@ function App() {
                           >
 
                             <div className="tool-label">
+                              <div className="form_field_type">
+                                {task.textToShow}
+                              </div>
                               <label>
-                              {task.required && <span className="required">*</span> }
+                                {task.required && <span className="required">*</span> }
                                 {task.placeHolderLabel}
                               </label>                              
                               <ul className="tool-actions">
                                 <li onClick={() => {editFieldData(index)}}>Edit</li>
-                                <li onClick={() => {deleteFieldData(index)}}>Delete</li>
+                                <li onClick={() => {deleteFieldData(task.uniqId)}}>Delete</li>
                               </ul>
                             </div>
                               
-                            {task.fieldtype == 'input' &&
+                            {task.fieldtype === 'input' &&
                               <input className="text-input"  type="text" 
                                 name={task.name} 
                                 id={task.id} 
                                 placeholder={task.placeHolderText} 
                                 required = {task.required}
                                 value = {task.defaultValue}
+                                readOnly
                               />
                             }
-                            {task.fieldtype == 'dropdown' &&
+
+                            {task.fieldtype === 'numberinput' &&
+                              <input className="text-input"  type="number" 
+                                name={task.name} 
+                                id={task.id} 
+                                placeholder={task.placeHolderText} 
+                                required = {task.required}
+                                value = {task.defaultValue}
+                                minimum = {task.minimum}
+                                maximum = {task.maximum}                                
+                              />
+                            }
+
+                            {task.fieldtype === 'date' &&
+                              <input className="text-input"  type="date" 
+                                name={task.name} 
+                                id={task.id} 
+                                placeholder={task.placeHolderText} 
+                                required = {task.required}                                
+                              />
+                            }
+
+                            {task.fieldtype === 'textarea' &&
+                              <textarea className="text-input text-area"   
+                                name={task.name} 
+                                id={task.id}
+                                placeholder={task.placeHolderText} 
+                                required = {task.required}                                
+                              >
+                                {task.defaultValue}
+                              </textarea>
+                            }
+                            {task.fieldtype === 'dropdown' &&
                               <select >
                                 <option>Select</option>
-                                <option>Testing 1</option>
-                                <option>Testing 2</option>
+                                {task.options.map((items, i) =>
+                                  <option key={i}>{items.option}</option>
+                                )}
                               </select>
                             }
-                            {task.fieldtype == 'radio' &&
+
+                            {task.fieldtype === 'radio' &&
                               <>
-                                <input type="radio" name="name" id="name" value="Male" /> Male
-                                <input type="radio" name="name" id="name" value="Female" /> Female
+                                {task.options.map((items, i) =>
+                                  <div key={i} className="radio_cont">
+                                    <input type="radio" value={items.option} 
+                                      checked = {items.option === task.defaultValue ? true : false }
+                                    /> 
+                                    <label>{items.label}</label>
+                                  </div>
+                                )}
                               </>
                             }
                           </div>
@@ -171,7 +339,7 @@ function App() {
             </div>
           </div>
 
-          <div className="toolbox-container">
+          <div className="toolbox-container">            
             <ul className="toolbox-list">
               {toolBoxData.map((items, i) =>
                 <li
@@ -186,42 +354,138 @@ function App() {
           </div>
 
 
-          
+        </div>
+
           {popupShow && 
             <div className="popup-container">
               <div className="popup-inner">
                 <span onClick={() => {closePopup()}} className="popup-close"  > X </span>                
-                <h2 className="popup-header">{popupData.fieldtype} Editor</h2>
+                <h2 className="popup-header">{popupData.textToShow} Editor</h2>
                 <div className="popform">
+                  
                   <label>Label Name : </label>
                   <input type="text" 
                          value = {popupData.placeHolderLabel} 
                          onChange={e => updatePopupData("placeHolderLabel",e.target.value)}
                   />
 
-                  <label>Default Value : </label>
-                  <input type="text" 
-                         value = {popupData.defaultValue} 
-                         onChange={e => updatePopupData("defaultValue",e.target.value)}
-                  />
+                  { (popupData.fieldtype === 'input' || popupData.fieldtype === 'numberinput' || popupData.fieldtype === 'textarea') && 
+                    <>
+                      <label>Default Value : </label>
+                      <input type="text" 
+                            value = {popupData.defaultValue} 
+                            onChange={e => updatePopupData("defaultValue",e.target.value)}
+                      />
+                    </>
+                  }
                   
-                  <label>Input Name attr :</label>
-                  <input type="text" 
-                         value = {popupData.name} 
-                         onChange={e => updatePopupData("name",e.target.value)}        
-                  />
+                  { (popupData.fieldtype === 'numberinput') && 
+                    <>
+                      <label>Minimum : </label>
+                      <input type="number" 
+                            value = {popupData.minimum} 
+                            onChange={e => updatePopupData("minimum",e.target.value)}
+                      />
 
-                  <label>Input id attr:</label>
-                  <input type="text" 
-                         value = {popupData.id} 
-                         onChange={e => updatePopupData("id",e.target.value)}
-                  />
+                      <label> Maximum : </label>
+                      <input type="number" 
+                            value = {popupData.maximum} 
+                            onChange={e => updatePopupData("maximum",e.target.value)}
+                      />
+                    </>
+                  }
+
+                  {popupData.fieldtype !== 'radio' &&
+                    <>
+                      <label>{popupData.textToShow} Name attr :</label>
+                      <input type="text" 
+                            value = {popupData.name} 
+                            onChange={e => updatePopupData("name",e.target.value)}        
+                      />
+
+                      <label>{popupData.textToShow} id attr:</label>
+                      <input type="text" 
+                            value = {popupData.id} 
+                            onChange={e => updatePopupData("id",e.target.value)}
+                      />
+                    </>
+                  }
 
                   <label>Mandatory/Required:</label>
                   <input type="checkbox"  
                       checked = {popupData.required ? true : false} 
                       onChange={e => updatePopupData("required",!popupData.required)}
                   /> Mandatory/Required
+
+                  
+                  { ( popupData.options && popupData.fieldtype === 'dropdown' ) &&
+                     <>
+                      <div>
+                          <h2>Options</h2>                        
+                          {popupData.options.map((items, i) =>
+                            <div className="popup-options">
+                              <input type="text"  
+                                onChange={e => updatePopupSelectOption(i,e.target.value)}      
+                                value={items.option}  />
+                              <span onClick={e => deletePopupSelectOption(i,items.id)}>X</span>
+                            </div>  
+                          )}
+                      </div>
+                      <div className="buttons-grp">
+                        <button
+                          className="done"
+                          onClick={e => addSelectOption()}>Add Option</button>
+                      </div>
+                    </>
+                  }
+
+
+                  { ( popupData.options && popupData.fieldtype === 'radio' ) &&
+                     <>
+                      <div>
+                          <h2>Options</h2>                        
+                          {popupData.options.map((items, i) =>
+                            <div key={i} className="popup-options">
+                              <input type="text"  
+                                onChange={e => updatePopupRadioOption(i,'label',e.target.value)}      
+                                value={items.label} 
+                                placeholder = "Label"
+                                className="col-25"  />
+                              <input type="text"  
+                                onChange={e => updatePopupRadioOption(i,'option',e.target.value)}      
+                                value={items.option} 
+                                placeholder = "Value"
+                                className="col-25" />
+                              <input type="text"  
+                                onChange={e => updatePopupRadioOption(i,'name',e.target.value)}      
+                                value={items.name} 
+                                placeholder = "Name Attr"
+                                className="col-25"  />
+                              <input type="text"  
+                                onChange={e => updatePopupRadioOption(i,'idattr',e.target.value)}      
+                                value={items.idattr} 
+                                placeholder = "Id Attr"
+                                className="col-25"  />
+                              <span onClick={e => deletePopupRadioOption(i,items.id)}>X</span>
+                            </div>  
+                          )}
+                      </div>
+                      <div className="buttons-grp">
+                        <button
+                          className="done"
+                          onClick={e => addRadioOption()}>Add Option</button>
+                      </div>
+
+                      <label>Default Selection : </label>
+                      <select onChange={e => updatePopupData("defaultValue",e.target.value)} >
+                        <option>Select</option>
+                        {popupData.options.map((items, i) =>
+                          <option key={i}>{items.option}</option>
+                        )}
+                      </select>
+                    </>
+                  }
+                  
                 
                   <div className="buttons-grp">
                     <button 
@@ -242,7 +506,7 @@ function App() {
 
       </div>
     </div>
-      {/* <Main /> */ }
+    
     </div >
   );
 }
